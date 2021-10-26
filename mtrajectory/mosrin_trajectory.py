@@ -10,6 +10,7 @@ Smooth trajectory object
 
 class Mtrajectory:
     def __init__(self, _x, _y, _stride_length):
+
         self.origin = [_x, _y]
         self.points = []
         self.points_num = 0
@@ -19,7 +20,12 @@ class Mtrajectory:
 
     def add_zero_curvature_point(self, _numbers):
 
-        for i in range(_numbers):
+        count = _numbers
+
+        if self.points_num > 0:
+            count -= 1
+
+        for i in range(count):
             if self.points_num == 0:
                 self.points.append(obosthan.OPoint2D(self.origin[0], self.origin[1]))
                 self.points_num += 1
@@ -30,7 +36,12 @@ class Mtrajectory:
 
     def add_constant_curvature_point(self, _radius, _numbers):
 
-        for i in range(_numbers):
+        count = _numbers
+
+        if self.points_num > 0:
+            count -= 1
+
+        for i in range(count):
             if self.points_num == 0:
                 self.points.append(obosthan.OPoint2D(self.origin[0], self.origin[1]))
                 self.points_num += 1
@@ -43,10 +54,15 @@ class Mtrajectory:
 
     def add_linear_curvature_point(self, _start_radius, _end_radius, _numbers):
 
+        count = _numbers
+
+        if self.points_num > 0:
+            count -= 1
+
         a = mtrajectory.mfind_clothoid_deflection_acceleration(_start_radius, _end_radius, self.stride_length*(_numbers-1), self.stride_length)
         di = mtrajectory.mfind_deflection(_start_radius, self.stride_length)[0]
 
-        for i in range(_numbers):
+        for i in range(count):
             if self.points_num == 0:
                 self.points.append(obosthan.OPoint2D(self.origin[0], self.origin[1]))
                 self.points_num += 1
