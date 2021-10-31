@@ -9,7 +9,21 @@ Curve dynamics routines
 
 STRAIGHT_RADIUS = 100000000000000000
 
+def mfind_radius(deflection, stride_length):
+
+    angle = (deflection - 180) / 2
+    num = 2 * math.cos(math.radians(angle))
+
+    return stride_length / num
+
+def mfind_radius1(deflection, stride_length):
+
+    # less accurate approach (derived from stride omega and speed)
+
+    return stride_length / math.radians(deflection)
+
 def mfind_deflection(turning_radius, stride_length):
+    # this assumes strides length do to change from one stride to next
 
     num = (stride_length**2)
     den = 2*stride_length*turning_radius
