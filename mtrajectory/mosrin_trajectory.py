@@ -30,6 +30,8 @@ class Mtrajectory:
                 self.points.append(obosthan.OPoint2D(self.origin[0], self.origin[1]))
                 self.points_num += 1
             else:
+                scale_amount = abs(float(self.stride_length / self.segment_vector.length))
+                self.segment_vector.scale(scale_amount)
                 self.segment_vector.rotate(self.segment_vector_angle)
                 self.points.append(obosthan.OPoint2D(self.points[-1][0] + self.segment_vector[0], self.points[-1][1] + self.segment_vector[1]))
                 self.points_num += 1
@@ -48,6 +50,8 @@ class Mtrajectory:
             else:
                 d = mtrajectory.mfind_deflection(_radius, self.stride_length)[0]
                 self.segment_vector_angle += d
+                scale_amount = abs(float(self.stride_length / self.segment_vector.length))
+                self.segment_vector.scale(scale_amount)
                 self.segment_vector.rotate(self.segment_vector_angle)
                 self.points.append(obosthan.OPoint2D(self.points[-1][0] + self.segment_vector[0], self.points[-1][1] + self.segment_vector[1]))
                 self.points_num += 1
@@ -69,6 +73,8 @@ class Mtrajectory:
             else:
                 d = (i * a) + di
                 self.segment_vector_angle += d
+                scale_amount = abs(float(self.stride_length / self.segment_vector.length))
+                self.segment_vector.scale(scale_amount)
                 self.segment_vector.rotate(self.segment_vector_angle)
                 self.points.append(obosthan.OPoint2D(self.points[-1][0] + self.segment_vector[0], self.points[-1][1] + self.segment_vector[1]))
                 self.points_num += 1
