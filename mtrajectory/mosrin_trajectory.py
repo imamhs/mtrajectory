@@ -25,7 +25,7 @@ class Mtrajectory:
                 self.segment_vector.rotate(self.segment_vector_angle)
                 self.points.append(obosthan.OPoint2D(self.points[-1][0] + self.segment_vector[0], self.points[-1][1] + self.segment_vector[1]))
                 self.points_num += 1
-                print(self.points_num, self.segment_vector.length)
+                # print(self.points_num, self.segment_vector.length)
 
     def add_constant_curvature_point(self, _radius, _numbers):
 
@@ -37,7 +37,7 @@ class Mtrajectory:
                 self.segment_vector.rotate(self.segment_vector_angle)
                 self.points.append(obosthan.OPoint2D(self.points[-1][0] + self.segment_vector[0], self.points[-1][1] + self.segment_vector[1]))
                 self.points_num += 1
-                print(self.points_num, self.segment_vector.length)
+                # print(self.points_num, self.segment_vector.length)
 
     def add_linear_curvature_point(self, _start_radius, _end_radius, _numbers):
 
@@ -52,4 +52,4 @@ class Mtrajectory:
                 self.segment_vector.rotate(self.segment_vector_angle)
                 self.points.append(obosthan.OPoint2D(self.points[-1][0] + self.segment_vector[0], self.points[-1][1] + self.segment_vector[1]))
                 self.points_num += 1
-                print(self.points_num, self.segment_vector.length)
+                # print(self.points_num, self.segment_vector.length)
