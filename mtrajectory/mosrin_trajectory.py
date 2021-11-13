@@ -2,7 +2,7 @@
 # see LICENSE.txt for details
 
 import obosthan
-import mtrajectory
+from .curve_dynamics import mfind_deflection, mfind_clothoid_deflection_acceleration
 
 """
 Smooth trajectory object
@@ -16,8 +16,14 @@ class Mtrajectory:
         self.stride_length = _stride_length
         self.segment_vector = obosthan.OVector2D(_stride_length, 0.0)
         self.segment_vector_angle = 0.0
+        self.horizontal_space = 0.0
+        self.vertical_space = 0.0
 
-    def add_zero_curvature_point(self, _numbers):
+    def update_space(self):
+        self.horizontal_space = abs(self.points[-1][0] - self.points[0][0])
+        self.vertical_space = abs(self.points[-1][1] - self.points[0][1])
+
+    def add_zero_curvature_segments(self, _numbers):
 
         for i in range(_numbers):
                 scale_amount = abs(float(self.stride_length / self.segment_vector.length))
@@ -25,24 +31,26 @@ class Mtrajectory:
                 self.segment_vector.rotate(self.segment_vector_angle)
                 self.points.append(obosthan.OPoint2D(self.points[-1][0] + self.segment_vector[0], self.points[-1][1] + self.segment_vector[1]))
                 self.points_num += 1
-                # print(self.points_num, self.segment_vector.length)
 
-    def add_constant_curvature_point(self, _radius, _numbers):
+        self.update_space()
+
+    def add_constant_curvature_segments(self, _radius, _numbers):
 
         for i in range(_numbers):
-                d = mtrajectory.mfind_deflection(_radius, self.stride_length)[0]
+                d = mfind_deflection(_radius, self.stride_length)[0]
                 self.segment_vector_angle += d
                 scale_amount = abs(float(self.stride_length / self.segment_vector.length))
                 self.segment_vector.scale(scale_amount)
                 self.segment_vector.rotate(self.segment_vector_angle)
                 self.points.append(obosthan.OPoint2D(self.points[-1][0] + self.segment_vector[0], self.points[-1][1] + self.segment_vector[1]))
                 self.points_num += 1
-                # print(self.points_num, self.segment_vector.length)
 
-    def add_linear_curvature_point(self, _start_radius, _end_radius, _numbers):
+        self.update_space()
 
-        a = mtrajectory.mfind_clothoid_deflection_acceleration(_start_radius, _end_radius, self.stride_length*(_numbers), self.stride_length)
-        di = mtrajectory.mfind_deflection(_start_radius, self.stride_length)[0]
+    def add_linear_curvature_segments(self, _start_radius, _end_radius, _numbers):
+
+        a = mfind_clothoid_deflection_acceleration(_start_radius, _end_radius, self.stride_length*(_numbers), self.stride_length)
+        di = mfind_deflection(_start_radius, self.stride_length)[0]
 
         for i in range(_numbers):
                 d = (i * a) + di
@@ -52,4 +60,5 @@ class Mtrajectory:
                 self.segment_vector.rotate(self.segment_vector_angle)
                 self.points.append(obosthan.OPoint2D(self.points[-1][0] + self.segment_vector[0], self.points[-1][1] + self.segment_vector[1]))
                 self.points_num += 1
-                # print(self.points_num, self.segment_vector.length)
+
+        self.update_space()
