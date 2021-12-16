@@ -30,7 +30,7 @@ def mfind_radius1(deflection, stride_length):
     return stride_length / math.radians(deflection)
 
 def mfind_deflection(turning_radius, stride_length):
-    # this assumes strides length do to change from one stride to next
+    # this assumes strides length to change from one stride to next
 
     num = (stride_length**2)
     den = 2*stride_length*turning_radius
