@@ -1,2 +1,3 @@
 # mtrajectory
-Smooth trajectory generation library
+Smooth trajectory generation library by using numerical modelling
+
