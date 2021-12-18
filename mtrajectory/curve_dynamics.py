@@ -17,24 +17,50 @@ def mfind_stride_length(deflection, turning_radius):
     return turning_radius * num
 
 def mfind_radius(deflection, stride_length):
+    # this assumes strides length to not change from first stride to next
 
     angle = (deflection - 180) / 2
     num = 2 * math.cos(math.radians(angle))
 
     return stride_length / num
 
-def mfind_radius1(deflection, stride_length):
+def mfind_radius1(deflection, stride_length_f, stride_length_n):
+    # this assumes strides length to change from first stride to next
+
+    angle = math.radians(180 - deflection)
+    area = stride_length_f * stride_length_n * (math.sin(angle)/2)
+    displacement =  math.sqrt((stride_length_f**2) + (stride_length_n**2) - (2*stride_length_f*stride_length_n*math.cos(angle)))
+
+    return (stride_length_f*stride_length_n*displacement) / (4*area)
+
+def mfind_radius2(deflection, stride_length):
 
     # less accurate approach (derived from stride omega and speed)
+    # this assumes strides length to not change from first stride to next
 
     return stride_length / math.radians(deflection)
 
 def mfind_deflection(turning_radius, stride_length):
-    # this assumes strides length to change from one stride to next
+    # this assumes strides length to not change from first stride to next
 
-    num = (stride_length**2)
-    den = 2*stride_length*turning_radius
+    num = stride_length
+    den = 2*turning_radius
     stride_angle = math.degrees(math.acos(num/den))*2
+    return ((180-stride_angle), stride_angle)
+
+def mfind_deflection1(turning_radius, stride_length_f, stride_length_n):
+    # this assumes strides length to change from first stride to next
+
+    num = stride_length_f
+    den = 2*turning_radius
+    angle1 = math.degrees(math.acos(num/den))
+
+    num = stride_length_n
+    den = 2*turning_radius
+    angle2 = math.degrees(math.acos(num/den))
+
+    stride_angle = angle1 + angle2
+
     return ((180-stride_angle), stride_angle)
 
 def mfind_clothoid_deflection_acceleration(start_turning_radius, end_turning_radius, curve_length, stride_length):
