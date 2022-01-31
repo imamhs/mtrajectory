@@ -2,10 +2,10 @@
 # see LICENSE.txt for details
 
 import obosthan
-from .curve_dynamics import mfind_deflection, mfind_clothoid_deflection_acceleration
+from .curve_dynamics import mfind_deflection, mfind_deflection1, mfind_clothoid_deflection_acceleration, mfind_stride_length1
 
 """
-Smooth trajectory object
+Trajectory generation object
 """
 
 class Mtrajectory:
