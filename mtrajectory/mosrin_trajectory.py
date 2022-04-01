@@ -1,4 +1,4 @@
-# Copyright (c) 2020-2021, Md Imam Hossain (emamhd at gmail dot com)
+# Copyright (c) 2020-2022, Md Imam Hossain (emamhd at gmail dot com)
 # see LICENSE.txt for details
 
 import obosthan
@@ -17,8 +17,8 @@ class Mtrajectory:
         self.stride_length = _stride_length
         self.segment_vector = obosthan.OVector2D(_stride_length, 0.0)
         self.segment_vector_angle = 0.0
-        self.horizontal_BB = 0.0 # Horizontal dimension of the bounding box
-        self.vertical_BB = 0.0 # Vertical dimension of the bounding box
+        self.horizontal_BB = 0.0  # Horizontal dimension of the bounding box
+        self.vertical_BB = 0.0  # Vertical dimension of the bounding box
 
     def calculate_BB(self, _start, _end):
 
@@ -38,7 +38,7 @@ class Mtrajectory:
             if vmax > p[1]:
                 vmax = p[1]
 
-        return (abs(hmax-hmin),abs(vmax-vmin))
+        return (abs(hmax-hmin), abs(vmax-vmin))
 
     def add_zero_curvature_segments(self, _numbers):
 

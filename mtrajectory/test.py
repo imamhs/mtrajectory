@@ -1,10 +1,8 @@
-# Copyright (c) 2020-2021, Md Imam Hossain (emamhd at gmail dot com)
+# Copyright (c) 2020-2022, Md Imam Hossain (emamhd at gmail dot com)
 # see LICENSE.txt for details
 
 import mtrajectory
 from math import isclose
-
-print(mtrajectory.mfind_deflection1(50, 5, 3.7237))
 
 # Unit tests
 
