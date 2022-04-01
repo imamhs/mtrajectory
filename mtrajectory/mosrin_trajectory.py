@@ -60,8 +60,9 @@ class Mtrajectory:
 
         i_point_index = self.points_num
 
+        d = mfind_deflection(_radius, self.stride_length)[0]
+
         for i in range(_numbers):
-            d = mfind_deflection(_radius, self.stride_length)[0]
             self.segment_vector_angle += d
             scale_amount = abs(float(self.stride_length / self.segment_vector.length))
             self.segment_vector.scale(scale_amount)
@@ -94,3 +95,41 @@ class Mtrajectory:
         self.horizontal_BB, self.vertical_BB = self.calculate_BB(0, self.points_num)
 
         return self.calculate_BB(i_point_index-1, self.points_num)
+
+    def add_constant_acceleration_segments(self, _acceleration, _start_radius, _numbers):
+
+        di = mfind_deflection(_start_radius, self.stride_length)[0]
+
+        i_point_index = self.points_num
+
+        for i in range(_numbers):
+            d = (i * _acceleration) + di
+            self.segment_vector_angle += d
+            scale_amount = abs(float(self.stride_length / self.segment_vector.length))
+            self.segment_vector.scale(scale_amount)
+            self.segment_vector.rotate(self.segment_vector_angle)
+            self.points.append(obosthan.OPoint2D(self.points[-1][0] + self.segment_vector[0],
+                                                 self.points[-1][1] + self.segment_vector[1]))
+            self.points_num += 1
+            self.segments_length += self.stride_length
+
+        self.horizontal_BB, self.vertical_BB = self.calculate_BB(0, self.points_num)
+
+        return self.calculate_BB(i_point_index - 1, self.points_num)
+
+    def add_constant_deflection_segments(self, _deflection, _numbers):
+
+        i_point_index = self.points_num
+
+        for i in range(_numbers):
+            self.segment_vector_angle += _deflection
+            scale_amount = abs(float(self.stride_length / self.segment_vector.length))
+            self.segment_vector.scale(scale_amount)
+            self.segment_vector.rotate(self.segment_vector_angle)
+            self.points.append(obosthan.OPoint2D(self.points[-1][0] + self.segment_vector[0], self.points[-1][1] + self.segment_vector[1]))
+            self.points_num += 1
+            self.segments_length += self.stride_length
+
+        self.horizontal_BB, self.vertical_BB = self.calculate_BB(0, self.points_num)
+
+        return self.calculate_BB(i_point_index - 1, self.points_num)

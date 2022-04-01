@@ -109,13 +109,11 @@ def mfind_clothoid_radius(angular_acceleration, curve_length, stride_length):
     num = math.sqrt(2)*(stride_length**2)*math.sqrt((2*(stride_length**2)*num_cos)+(2*(stride_length**2)))
     den_cos = math.cos((math.pi*angular_acceleration*((curve_length/stride_length)-1))/90)
     den = 2 * math.sqrt(-1*(stride_length**4)*(den_cos-1))
-    R = num/den
-    return R
+    return num/den
 
 
 def mfind_jerk(instance_radius1, instance_radius2, instance_speed, instance_time):
 
     ca1 = (instance_speed**2)/instance_radius1
     ca2 = (instance_speed**2)/instance_radius2
-    jerk = (ca2-ca1)/instance_time
-    return jerk
+    return (ca2-ca1) / instance_time
