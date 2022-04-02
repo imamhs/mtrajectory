@@ -117,12 +117,16 @@ class Mtrajectory:
 
         return self.calculate_BB(i_point_index - 1, self.points_num)
 
-    def add_constant_deflection_segments(self, _deflection, _numbers):
+    def add_constant_deflection_segments(self, _deflection_c, _numbers, _deflection_i=None):
 
         i_point_index = self.points_num
 
         for i in range(_numbers):
-            self.segment_vector_angle += _deflection
+            if i == 0 and (_deflection_i is not None):
+                self.segment_vector_angle += _deflection_i
+            else:
+                self.segment_vector_angle += _deflection_c
+
             scale_amount = abs(float(self.stride_length / self.segment_vector.length))
             self.segment_vector.scale(scale_amount)
             self.segment_vector.rotate(self.segment_vector_angle)
