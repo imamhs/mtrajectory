@@ -6,8 +6,8 @@ from math import isclose
 
 # Unit tests
 
-assert isclose(mtrajectory.mfind_stride_length(23.0739, 50), 20.0, abs_tol=0.01) == True, "mfind_stride_length test failed"
-assert isclose(mtrajectory.mfind_stride_length1(5, 50, 5), 3.7237, abs_tol=0.01) == True, "mfind_stride_length1 test failed"
+assert isclose(mtrajectory.mfind_step_length(23.0739, 50), 20.0, abs_tol=0.01) == True, "mfind_step_length test failed"
+assert isclose(mtrajectory.mfind_step_length1(5, 50, 5), 3.7237, abs_tol=0.01) == True, "mfind_step_length1 test failed"
 assert isclose(mtrajectory.mfind_radius(23.0739, 20), 50.0, abs_tol=0.01) == True, "mfind_radius test failed"
 assert isclose(mtrajectory.mfind_radius1(5.0, 5, 3.7237), 50.0, abs_tol=0.01) == True, "mfind_radius1 test failed"
 assert isclose(mtrajectory.mfind_radius2(23.0739, 20), 49.6628, abs_tol=0.01) == True, "mfind_radius2 test failed"
