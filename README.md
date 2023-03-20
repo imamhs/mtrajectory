@@ -6,4 +6,4 @@ For usages and applications restrictions please refer to LICENSE.txt
 
 Cheers!
 
-Md Imam Hossain (emamhd@gmail.com)
+Imam Hossain (emamhd@gmail.com)
