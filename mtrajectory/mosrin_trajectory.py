@@ -1,4 +1,4 @@
-# Copyright (c) 2020-2022, Md Imam Hossain (emamhd at gmail dot com)
+# Copyright (c) 2020-2023, Md Imam Hossain (emamhd at gmail dot com)
 # see LICENSE.txt for details
 
 import obosthan
@@ -133,6 +133,31 @@ class Mtrajectory:
             self.points.append(obosthan.OPoint2D(self.points[-1][0] + self.segment_vector[0], self.points[-1][1] + self.segment_vector[1]))
             self.points_num += 1
             self.segments_length += self.step_length
+
+        self.horizontal_BB, self.vertical_BB = self.calculate_BB(0, self.points_num)
+
+        return self.calculate_BB(i_point_index - 1, self.points_num)
+
+    def add_segments_from_points(self, _plist):
+
+        sz = len(_plist)
+
+        if sz < 2:
+            return False
+
+        i_point_index = self.points_num
+
+        for pi in range(1, sz):
+            segment_vector = obosthan.OVector2D(0, 0)
+            segment_vector.define_line(_plist[pi-1][0], _plist[pi-1][1], _plist[pi][0], _plist[pi][1])
+            self.segment_vector_angle += segment_vector.angle
+
+            scale_amount = abs(float(segment_vector.length / self.segment_vector.length))
+            self.segment_vector.scale(scale_amount)
+            self.segment_vector.rotate(self.segment_vector_angle)
+            self.points.append(obosthan.OPoint2D(self.points[-1][0] + self.segment_vector[0], self.points[-1][1] + self.segment_vector[1]))
+            self.points_num += 1
+            self.segments_length += segment_vector.length
 
         self.horizontal_BB, self.vertical_BB = self.calculate_BB(0, self.points_num)
 

@@ -1,4 +1,4 @@
-# Copyright (c) 2020-2022, Md Imam Hossain (emamhd at gmail dot com)
+# Copyright (c) 2020-2023, Md Imam Hossain (emamhd at gmail dot com)
 # see LICENSE.txt for details
 
 import math
@@ -101,7 +101,6 @@ def mfind_clothoid_heading(start_turning_radius, end_turning_radius, nsegments, 
         angle += d
 
     return angle
-
 
 def mfind_clothoid_radius(angular_acceleration, curve_length, step_length):
 
