@@ -2,7 +2,7 @@
 # see LICENSE.txt for details
 
 import obosthan
-from .curve_dynamics import mfind_deflection, mfind_clothoid_deflection_acceleration
+from .curve_dynamics import mfind_deflection, mfind_deflection1, mfind_clothoid_deflection_acceleration
 
 """
 Trajectory generation object
@@ -15,6 +15,7 @@ class Mtrajectory:
         self.points_num = 1
         self.segments_length = 0.0
         self.step_length = _step_length
+        self.pre_step_length = 0.0
         self.segment_vector = obosthan.OVector2D(_step_length, 0.0)
         self.segment_vector_angle = 0.0
         self.horizontal_BB = 0.0  # Horizontal dimension of the bounding box
@@ -53,17 +54,22 @@ class Mtrajectory:
             self.segments_length += self.step_length
 
         self.horizontal_BB, self.vertical_BB = self.calculate_BB(0, self.points_num)
+        self.pre_step_length = self.step_length
 
         return self.calculate_BB(i_point_index - 1, self.points_num)
 
-    def add_constant_curvature_segments(self, _radius, _numbers):
+    def add_constant_curvature_segments(self, _radius, _numbers, _con=False):
 
         i_point_index = self.points_num
 
+        dcon = mfind_deflection1(_radius, self.pre_step_length, self.step_length)[0]
         d = mfind_deflection(_radius, self.step_length)[0]
 
         for i in range(_numbers):
-            self.segment_vector_angle += d
+            if i == 0 and _con is True:
+                self.segment_vector_angle += dcon
+            else:
+                self.segment_vector_angle += d
             scale_amount = abs(float(self.step_length / self.segment_vector.length))
             self.segment_vector.scale(scale_amount)
             self.segment_vector.rotate(self.segment_vector_angle)
@@ -72,19 +78,25 @@ class Mtrajectory:
             self.segments_length += self.step_length
 
         self.horizontal_BB, self.vertical_BB = self.calculate_BB(0, self.points_num)
+        self.pre_step_length = self.step_length
 
         return self.calculate_BB(i_point_index - 1, self.points_num)
 
-    def add_linear_curvature_segments(self, _start_radius, _end_radius, _numbers):
+    def add_linear_curvature_segments(self, _start_radius, _end_radius, _numbers, _con=False):
 
         a = mfind_clothoid_deflection_acceleration(_start_radius, _end_radius, self.step_length*(_numbers), self.step_length)
+        dcon = mfind_deflection1(_start_radius, self.pre_step_length, self.step_length)[0]
         di = mfind_deflection(_start_radius, self.step_length)[0]
 
         i_point_index = self.points_num
 
         for i in range(_numbers):
-            d = (i * a) + di
-            self.segment_vector_angle += d
+            if i == 0 and _con is True:
+                d = (i * a) + dcon
+                self.segment_vector_angle += d
+            else:
+                d = (i * a) + di
+                self.segment_vector_angle += d
             scale_amount = abs(float(self.step_length / self.segment_vector.length))
             self.segment_vector.scale(scale_amount)
             self.segment_vector.rotate(self.segment_vector_angle)
@@ -93,18 +105,24 @@ class Mtrajectory:
             self.segments_length += self.step_length
 
         self.horizontal_BB, self.vertical_BB = self.calculate_BB(0, self.points_num)
+        self.pre_step_length = self.step_length
 
         return self.calculate_BB(i_point_index-1, self.points_num)
 
-    def add_constant_acceleration_segments(self, _acceleration, _start_radius, _numbers):
+    def add_constant_acceleration_segments(self, _acceleration, _start_radius, _numbers, _con=False):
 
         di = mfind_deflection(_start_radius, self.step_length)[0]
+        dcon = mfind_deflection1(_start_radius, self.pre_step_length, self.step_length)[0]
 
         i_point_index = self.points_num
 
         for i in range(_numbers):
-            d = (i * _acceleration) + di
-            self.segment_vector_angle += d
+            if i == 0 and _con is True:
+                d = (i * _acceleration) + dcon
+                self.segment_vector_angle += d
+            else:
+                d = (i * _acceleration) + di
+                self.segment_vector_angle += d
             scale_amount = abs(float(self.step_length / self.segment_vector.length))
             self.segment_vector.scale(scale_amount)
             self.segment_vector.rotate(self.segment_vector_angle)
@@ -114,6 +132,7 @@ class Mtrajectory:
             self.segments_length += self.step_length
 
         self.horizontal_BB, self.vertical_BB = self.calculate_BB(0, self.points_num)
+        self.pre_step_length = self.step_length
 
         return self.calculate_BB(i_point_index - 1, self.points_num)
 
@@ -135,30 +154,11 @@ class Mtrajectory:
             self.segments_length += self.step_length
 
         self.horizontal_BB, self.vertical_BB = self.calculate_BB(0, self.points_num)
+        self.pre_step_length = self.step_length
 
         return self.calculate_BB(i_point_index - 1, self.points_num)
 
     def add_segments_from_points(self, _plist):
 
-        sz = len(_plist)
+        pass
 
-        if sz < 2:
-            return False
-
-        i_point_index = self.points_num
-
-        for pi in range(1, sz):
-            segment_vector = obosthan.OVector2D(0, 0)
-            segment_vector.define_line(_plist[pi-1][0], _plist[pi-1][1], _plist[pi][0], _plist[pi][1])
-            self.segment_vector_angle += segment_vector.angle
-
-            scale_amount = abs(float(segment_vector.length / self.segment_vector.length))
-            self.segment_vector.scale(scale_amount)
-            self.segment_vector.rotate(self.segment_vector_angle)
-            self.points.append(obosthan.OPoint2D(self.points[-1][0] + self.segment_vector[0], self.points[-1][1] + self.segment_vector[1]))
-            self.points_num += 1
-            self.segments_length += segment_vector.length
-
-        self.horizontal_BB, self.vertical_BB = self.calculate_BB(0, self.points_num)
-
-        return self.calculate_BB(i_point_index - 1, self.points_num)
