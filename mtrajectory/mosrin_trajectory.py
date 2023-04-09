@@ -13,6 +13,7 @@ class Mtrajectory:
 
         self.points = [(_x, _y)]
         self.points_num = 1
+        self.segments_num = 0  # store number of segments
         self.segments_length = 0.0
         self.step_length = _step_length
         self.pre_step_length = 0.0
@@ -51,6 +52,7 @@ class Mtrajectory:
             self.segment_vector.rotate(self.segment_vector_angle)
             self.points.append(obosthan.OPoint2D(self.points[-1][0] + self.segment_vector[0], self.points[-1][1] + self.segment_vector[1]))
             self.points_num += 1
+            self.segments_num += 1
             self.segments_length += self.step_length
 
         self.horizontal_BB, self.vertical_BB = self.calculate_BB(0, self.points_num)
@@ -75,6 +77,7 @@ class Mtrajectory:
             self.segment_vector.rotate(self.segment_vector_angle)
             self.points.append(obosthan.OPoint2D(self.points[-1][0] + self.segment_vector[0], self.points[-1][1] + self.segment_vector[1]))
             self.points_num += 1
+            self.segments_num += 1
             self.segments_length += self.step_length
 
         self.horizontal_BB, self.vertical_BB = self.calculate_BB(0, self.points_num)
@@ -102,6 +105,7 @@ class Mtrajectory:
             self.segment_vector.rotate(self.segment_vector_angle)
             self.points.append(obosthan.OPoint2D(self.points[-1][0] + self.segment_vector[0], self.points[-1][1] + self.segment_vector[1]))
             self.points_num += 1
+            self.segments_num += 1
             self.segments_length += self.step_length
 
         self.horizontal_BB, self.vertical_BB = self.calculate_BB(0, self.points_num)
@@ -129,6 +133,7 @@ class Mtrajectory:
             self.points.append(obosthan.OPoint2D(self.points[-1][0] + self.segment_vector[0],
                                                  self.points[-1][1] + self.segment_vector[1]))
             self.points_num += 1
+            self.segments_num += 1
             self.segments_length += self.step_length
 
         self.horizontal_BB, self.vertical_BB = self.calculate_BB(0, self.points_num)
@@ -151,6 +156,7 @@ class Mtrajectory:
             self.segment_vector.rotate(self.segment_vector_angle)
             self.points.append(obosthan.OPoint2D(self.points[-1][0] + self.segment_vector[0], self.points[-1][1] + self.segment_vector[1]))
             self.points_num += 1
+            self.segments_num += 1
             self.segments_length += self.step_length
 
         self.horizontal_BB, self.vertical_BB = self.calculate_BB(0, self.points_num)
