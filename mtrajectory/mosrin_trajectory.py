@@ -160,5 +160,37 @@ class Mtrajectory:
 
     def add_segments_from_points(self, _plist):
 
-        pass
+        sz = len(_plist)
+
+        if sz < 2:
+            return False
+
+        i_point_index = self.points_num
+
+        for i in range(1, sz):
+            pv = obosthan.OVector2D(0.0, 0.0)
+            pv.define_line(_plist[i-1][0], _plist[i-1][1], _plist[i][0], _plist[i][1])
+
+            if self.points_num > 1:
+                lpv = obosthan.OVector2D(0.0, 0.0)
+                lpv.define_line(self.points[-2][0], self.points[-2][1], self.points[-1][0], self.points[-1][1])
+                self.segment_vector_angle += lpv.angle_to(pv)
+            else:
+                self.segment_vector_angle += pv.angle
+
+            scale_amount = abs(float(pv.length / self.segment_vector.length))
+            self.segment_vector.scale(scale_amount)
+            self.segment_vector.rotate(self.segment_vector_angle)
+            self.points.append(obosthan.OPoint2D(self.points[-1][0] + self.segment_vector[0], self.points[-1][1] + self.segment_vector[1]))
+            self.points_num += 1
+            self.segments_length += pv.length
+
+        self.horizontal_BB, self.vertical_BB = self.calculate_BB(0, self.points_num)
+        self.pre_step_length = pv.length
+
+        return self.calculate_BB(i_point_index - 1, self.points_num)
+
+
+
+
 
