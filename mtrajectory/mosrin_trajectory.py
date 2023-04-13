@@ -2,7 +2,9 @@
 # see LICENSE.txt for details
 
 import obosthan
-from .curve_dynamics import mfind_deflection, mfind_deflection1, mfind_clothoid_deflection_acceleration
+from .curve_dynamics import mfind_deflection, mfind_deflection1, mfind_clothoid_deflection_acceleration, STRAIGHT_RADIUS
+
+from math import sqrt
 
 """
 Trajectory generation object
@@ -13,11 +15,11 @@ class Mtrajectory:
 
         self.points = [(_x, _y)]
         self.points_num = 1
-        self.segments_num = 0  # store number of segments
         self.segments_length = 0.0
         self.step_length = _step_length
         self.pre_step_length = 0.0
         self.segment_vector = obosthan.OVector2D(_step_length, 0.0)
+        self.segment_vector_step_angle = 0.0
         self.segment_vector_angle = 0.0
         self.horizontal_BB = 0.0  # Horizontal dimension of the bounding box
         self.vertical_BB = 0.0  # Vertical dimension of the bounding box
@@ -52,7 +54,6 @@ class Mtrajectory:
             self.segment_vector.rotate(self.segment_vector_angle)
             self.points.append(obosthan.OPoint2D(self.points[-1][0] + self.segment_vector[0], self.points[-1][1] + self.segment_vector[1]))
             self.points_num += 1
-            self.segments_num += 1
             self.segments_length += self.step_length
 
         self.horizontal_BB, self.vertical_BB = self.calculate_BB(0, self.points_num)
@@ -70,14 +71,16 @@ class Mtrajectory:
         for i in range(_numbers):
             if i == 0 and _con is True:
                 self.segment_vector_angle += dcon
+                self.segment_vector_step_angle = dcon
             else:
                 self.segment_vector_angle += d
+                self.segment_vector_step_angle = d
+
             scale_amount = abs(float(self.step_length / self.segment_vector.length))
             self.segment_vector.scale(scale_amount)
             self.segment_vector.rotate(self.segment_vector_angle)
             self.points.append(obosthan.OPoint2D(self.points[-1][0] + self.segment_vector[0], self.points[-1][1] + self.segment_vector[1]))
             self.points_num += 1
-            self.segments_num += 1
             self.segments_length += self.step_length
 
         self.horizontal_BB, self.vertical_BB = self.calculate_BB(0, self.points_num)
@@ -95,17 +98,18 @@ class Mtrajectory:
 
         for i in range(_numbers):
             if i == 0 and _con is True:
-                d = (i * a) + dcon
-                self.segment_vector_angle += d
+                self.segment_vector_angle += dcon
+                self.segment_vector_step_angle = dcon
             else:
                 d = (i * a) + di
                 self.segment_vector_angle += d
+                self.segment_vector_step_angle = d
+
             scale_amount = abs(float(self.step_length / self.segment_vector.length))
             self.segment_vector.scale(scale_amount)
             self.segment_vector.rotate(self.segment_vector_angle)
             self.points.append(obosthan.OPoint2D(self.points[-1][0] + self.segment_vector[0], self.points[-1][1] + self.segment_vector[1]))
             self.points_num += 1
-            self.segments_num += 1
             self.segments_length += self.step_length
 
         self.horizontal_BB, self.vertical_BB = self.calculate_BB(0, self.points_num)
@@ -122,18 +126,19 @@ class Mtrajectory:
 
         for i in range(_numbers):
             if i == 0 and _con is True:
-                d = (i * _acceleration) + dcon
-                self.segment_vector_angle += d
+                self.segment_vector_angle += dcon
+                self.segment_vector_step_angle = dcon
             else:
                 d = (i * _acceleration) + di
                 self.segment_vector_angle += d
+                self.segment_vector_step_angle = d
+
             scale_amount = abs(float(self.step_length / self.segment_vector.length))
             self.segment_vector.scale(scale_amount)
             self.segment_vector.rotate(self.segment_vector_angle)
             self.points.append(obosthan.OPoint2D(self.points[-1][0] + self.segment_vector[0],
                                                  self.points[-1][1] + self.segment_vector[1]))
             self.points_num += 1
-            self.segments_num += 1
             self.segments_length += self.step_length
 
         self.horizontal_BB, self.vertical_BB = self.calculate_BB(0, self.points_num)
@@ -141,22 +146,23 @@ class Mtrajectory:
 
         return self.calculate_BB(i_point_index - 1, self.points_num)
 
-    def add_constant_deflection_segments(self, _deflection_c, _numbers, _deflection_i=None):
+    def add_constant_deflection_segments(self, _deflection_c, _numbers, _deflection_i=0.0):
 
         i_point_index = self.points_num
 
         for i in range(_numbers):
-            if i == 0 and (_deflection_i is not None):
+            if i == 0 and (_deflection_i != 0.0):
                 self.segment_vector_angle += _deflection_i
+                self.segment_vector_step_angle = _deflection_i
             else:
                 self.segment_vector_angle += _deflection_c
+                self.segment_vector_step_angle = _deflection_c
 
             scale_amount = abs(float(self.step_length / self.segment_vector.length))
             self.segment_vector.scale(scale_amount)
             self.segment_vector.rotate(self.segment_vector_angle)
             self.points.append(obosthan.OPoint2D(self.points[-1][0] + self.segment_vector[0], self.points[-1][1] + self.segment_vector[1]))
             self.points_num += 1
-            self.segments_num += 1
             self.segments_length += self.step_length
 
         self.horizontal_BB, self.vertical_BB = self.calculate_BB(0, self.points_num)
@@ -164,12 +170,14 @@ class Mtrajectory:
 
         return self.calculate_BB(i_point_index - 1, self.points_num)
 
-    def add_segments_from_points(self, _plist):
+    def add_segments_from_points(self, _plist, _con=False):
 
         sz = len(_plist)
 
         if sz < 2:
             return False
+
+        prev_pv_angle = 0
 
         i_point_index = self.points_num
 
@@ -177,12 +185,40 @@ class Mtrajectory:
             pv = obosthan.OVector2D(0.0, 0.0)
             pv.define_line(_plist[i-1][0], _plist[i-1][1], _plist[i][0], _plist[i][1])
 
-            if self.points_num > 1:
-                lpv = obosthan.OVector2D(0.0, 0.0)
-                lpv.define_line(self.points[-2][0], self.points[-2][1], self.points[-1][0], self.points[-1][1])
-                self.segment_vector_angle += lpv.angle_to(pv)
+            if i == 1:
+                if _con is True and sz > 2:
+                    joint_radius = STRAIGHT_RADIUS
+                    point1_x = _plist[0][0]
+                    point1_y = _plist[0][1]
+                    point2_x = _plist[1][0]
+                    point2_y = _plist[1][1]
+                    point3_x = _plist[2][0]
+                    point3_y = _plist[2][1]
+                    side_a = sqrt(((point2_x - point1_x) ** 2) + ((point2_y - point1_y) ** 2))
+                    side_b = sqrt(((point3_x - point2_x) ** 2) + ((point3_y - point2_y) ** 2))
+                    side_c = sqrt(((point3_x - point1_x) ** 2) + ((point3_y - point1_y) ** 2))
+                    semiperimeter = 0.5 * (side_a + side_b + side_c)
+                    delta = semiperimeter * (semiperimeter - side_a) * (semiperimeter - side_b) * (semiperimeter - side_c)
+                    triangle_area = 0.0
+                    if delta > 0.0:
+                        triangle_area = sqrt(delta)
+                    else:
+                        triangle_area = 0.0
+                    if triangle_area != 0.0:
+                        joint_radius = (side_a * side_b * side_c) / (4 * triangle_area)
+
+                    dcon = mfind_deflection1(joint_radius, self.pre_step_length, pv.length)[0]
+                    self.segment_vector_angle += dcon
+                    self.segment_vector_step_angle = dcon
+                    prev_pv_angle = pv.angle
+                else:
+                    prev_pv_angle = pv.angle
+                    self.segment_vector_angle += prev_pv_angle
+                    self.segment_vector_step_angle = prev_pv_angle
             else:
-                self.segment_vector_angle += pv.angle
+                self.segment_vector_step_angle = (pv.angle-prev_pv_angle)
+                self.segment_vector_angle += self.segment_vector_step_angle
+                prev_pv_angle = pv.angle
 
             scale_amount = abs(float(pv.length / self.segment_vector.length))
             self.segment_vector.scale(scale_amount)
@@ -195,8 +231,3 @@ class Mtrajectory:
         self.pre_step_length = pv.length
 
         return self.calculate_BB(i_point_index - 1, self.points_num)
-
-
-
-
-
