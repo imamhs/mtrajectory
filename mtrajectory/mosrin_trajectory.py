@@ -24,6 +24,9 @@ class Mtrajectory:
         self.horizontal_BB = 0.0  # Horizontal dimension of the bounding box
         self.vertical_BB = 0.0  # Vertical dimension of the bounding box
 
+    def analyse_curvature(self):
+        pass
+
     def calculate_BB(self, _start, _end):
 
         hmin, vmin = self.points[_start]
@@ -69,9 +72,13 @@ class Mtrajectory:
         d = mfind_deflection(_radius, self.step_length)[0]
 
         for i in range(_numbers):
-            if i == 0 and _con is True:
-                self.segment_vector_angle += dcon
-                self.segment_vector_step_angle = dcon
+            if i == 0:
+                if _con is True:
+                    self.segment_vector_angle += dcon
+                    self.segment_vector_step_angle = dcon
+                else:
+                    self.segment_vector_angle += d/2
+                    self.segment_vector_step_angle = d/2
             else:
                 self.segment_vector_angle += d
                 self.segment_vector_step_angle = d
