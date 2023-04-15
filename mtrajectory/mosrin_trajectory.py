@@ -24,8 +24,38 @@ class Mtrajectory:
         self.horizontal_BB = 0.0  # Horizontal dimension of the bounding box
         self.vertical_BB = 0.0  # Vertical dimension of the bounding box
 
-    def analyse_curvature(self):
-        pass
+    def analyse_segments_curvature(self):
+
+        if self.points_num < 3:
+            return False
+
+        segments_curvature = []
+
+        for i in range(2, self.points_num):
+
+            segment_curvature = 0
+            point1_x = self.points[i-2][0]
+            point1_y = self.points[i-2][1]
+            point2_x = self.points[i-1][0]
+            point2_y = self.points[i-1][1]
+            point3_x = self.points[i][0]
+            point3_y = self.points[i][1]
+            side_a = sqrt(((point2_x - point1_x) ** 2) + ((point2_y - point1_y) ** 2))
+            side_b = sqrt(((point3_x - point2_x) ** 2) + ((point3_y - point2_y) ** 2))
+            side_c = sqrt(((point3_x - point1_x) ** 2) + ((point3_y - point1_y) ** 2))
+            semiperimeter = 0.5 * (side_a + side_b + side_c)
+            delta = semiperimeter * (semiperimeter - side_a) * (semiperimeter - side_b) * (semiperimeter - side_c)
+            triangle_area = 0.0
+            if delta > 0.0:
+                triangle_area = sqrt(delta)
+            else:
+                triangle_area = 0.0
+            if triangle_area != 0.0:
+                segment_curvature = 1/((side_a * side_b * side_c) / (4 * triangle_area))
+
+            segments_curvature.append(segment_curvature)
+
+        return segments_curvature
 
     def calculate_BB(self, _start, _end):
 
