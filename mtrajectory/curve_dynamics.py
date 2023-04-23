@@ -87,7 +87,8 @@ def mfind_clothoid_deflection_acceleration(start_turning_radius, end_turning_rad
 
     d1 = mfind_deflection(start_turning_radius, step_length)[0]
     d2 = mfind_deflection(end_turning_radius, step_length)[0]
-    return (d2-d1)/(curve_length/step_length)
+    dd = d2-d1
+    return (dd/(curve_length/step_length), dd/curve_length)
 
 
 def mfind_clothoid_heading(start_turning_radius, end_turning_radius, nsegments, step_length):
@@ -101,6 +102,7 @@ def mfind_clothoid_heading(start_turning_radius, end_turning_radius, nsegments, 
         angle += d
 
     return angle
+
 
 def mfind_clothoid_radius(angular_acceleration, curve_length, step_length):
 
@@ -116,3 +118,4 @@ def mfind_jerk(instance_radius1, instance_radius2, instance_speed, instance_time
     ca1 = (instance_speed**2)/instance_radius1
     ca2 = (instance_speed**2)/instance_radius2
     return (ca2-ca1) / instance_time
+
